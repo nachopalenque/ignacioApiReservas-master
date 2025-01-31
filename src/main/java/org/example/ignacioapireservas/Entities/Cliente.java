@@ -3,6 +3,7 @@ package org.example.ignacioapireservas.Entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class Cliente {
     private Long id;
 
     @NotBlank(message = "El nombre del cliente no puede estar en blanco")
+    @Min(value = 3,message = "El nombre del cliente debe tener al menos 3 caracteres")
     private String nombre;
 
     @Column(unique = true)
