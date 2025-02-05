@@ -1,5 +1,6 @@
 package org.example.ignacioapireservas.Controllers;
 
+import org.example.ignacioapireservas.DTO.ClienteReservaMesaDTO;
 import org.example.ignacioapireservas.Entities.Cliente;
 import org.example.ignacioapireservas.Entities.Mesa;
 import org.example.ignacioapireservas.Entities.Reserva;
@@ -10,7 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-        import java.util.List;
+
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -38,6 +40,8 @@ public class ReservaController {
         }
     }
 
+
+
     @PostMapping("/reserva")
     public ResponseEntity<Reserva> insertaReserva(@RequestBody Reserva reserva) {
 
@@ -49,7 +53,7 @@ public class ReservaController {
             List<Reserva> reservasDelDia = reservaRepository.findByfechaReserva(reserva.getFechaReserva());
 
             for (Reserva res : reservasDelDia) {
-                if(res.getMesa() == reserva.getMesa() && res.getHoraReserva() == reserva.getHoraReserva()) {
+                if(res.getMesa().getId() == reserva.getMesa().getId() && res.getHoraReserva() == reserva.getHoraReserva()) {
 
                     return ResponseEntity.notFound().build();
                 }
@@ -66,5 +70,37 @@ public class ReservaController {
 
     }
 
+    @DeleteMapping("/reserva/{id}")
+    public ResponseEntity<Void> eliminaReservaId(@PathVariable Long id){
+        Optional<Reserva> reserva = reservaRepository.findById(id);
+
+        if(reserva.isPresent()){
+            reservaRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        else{
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
+    @PutMapping("/reserva/{id}")
+    public ResponseEntity<Reserva> actualizaReservaId(@PathVariable Long id, @RequestBody Reserva nuevaReserva){
+        Reserva reserva = reservaRepository.findById(id).get();
+        Optional<Mesa> mesa = mesaRepository.findById(nuevaReserva.getMesa().getId());
+        Optional<Cliente> cliente = clienteRepository.findById(nuevaReserva.getCliente().getId());
+
+        if(cliente.isPresent() && mesa.isPresent()){
+            reserva.setMesa(mesa.get());
+            reserva.setCliente(cliente.get());
+            reserva.setFechaReserva(nuevaReserva.getFechaReserva());
+            reserva.setHoraReserva(nuevaReserva.getHoraReserva());
+            return ResponseEntity.ok(reservaRepository.save(reserva));
+
+        }else{
+            return ResponseEntity.notFound().build();
+        }
+
+    }
 
 }
