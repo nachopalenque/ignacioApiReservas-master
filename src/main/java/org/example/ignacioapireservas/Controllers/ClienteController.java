@@ -1,8 +1,12 @@
 package org.example.ignacioapireservas.Controllers;
 
+import jakarta.validation.Valid;
 import org.example.ignacioapireservas.Entities.Cliente;
 import org.example.ignacioapireservas.Repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +26,15 @@ public class ClienteController {
         return ResponseEntity.ok(clientes);
     }
 
+
+    @GetMapping("/clientes/paginacion")
+    public ResponseEntity<Page<Cliente>> dameClientesPaginacion(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = (Pageable) PageRequest.of(page, size);
+        Page<Cliente> clientes = clienteRepository.findAll(pageable);
+        return ResponseEntity.ok(clientes);
+    }
+
+
     @GetMapping("/cliente/{id}")
     public ResponseEntity<Cliente> dameClienteId(@PathVariable Long id){
 
@@ -39,7 +52,7 @@ public class ClienteController {
 
     //insertar cliente
     @PostMapping("/cliente")
-    public ResponseEntity<Cliente> insertaCliente(@RequestBody Cliente cliente){
+    public ResponseEntity<Cliente> insertaCliente(@RequestBody @Valid Cliente cliente){
         var clienteNuevo = clienteRepository.save(cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteNuevo);
     }

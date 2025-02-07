@@ -1,5 +1,6 @@
 package org.example.ignacioapireservas.Controllers;
 
+import jakarta.validation.Valid;
 import org.example.ignacioapireservas.DTO.ClienteReservaMesaDTO;
 import org.example.ignacioapireservas.Entities.Cliente;
 import org.example.ignacioapireservas.Entities.Mesa;
@@ -8,6 +9,9 @@ import org.example.ignacioapireservas.Repositories.ClienteRepository;
 import org.example.ignacioapireservas.Repositories.MesaRepository;
 import org.example.ignacioapireservas.Repositories.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,9 +45,15 @@ public class ReservaController {
     }
 
 
+    @GetMapping("/reservas/paginacion")
+    public ResponseEntity<Page<Reserva>> dameClientesPaginacion(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = (Pageable) PageRequest.of(page, size);
+        Page<Reserva> reservas = reservaRepository.findAll(pageable);
+        return ResponseEntity.ok(reservas);
+    }
 
     @PostMapping("/reserva")
-    public ResponseEntity<Reserva> insertaReserva(@RequestBody Reserva reserva) {
+    public ResponseEntity<Reserva> insertaReserva(@RequestBody @Valid Reserva reserva) {
 
         //obtenemos los datos del cliente y de la mesa para posteriormente comprobar si existen
         Optional<Cliente> cliente = clienteRepository.findById(reserva.getCliente().getId());
