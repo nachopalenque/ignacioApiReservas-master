@@ -1,9 +1,13 @@
 package org.example.ignacioapireservas.Controllers;
 
 
+import jakarta.validation.Valid;
 import org.example.ignacioapireservas.Entities.Mesa;
 import org.example.ignacioapireservas.Repositories.MesaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,11 +42,17 @@ public class MesaController {
     }
 
     @PostMapping("/mesa")
-    public ResponseEntity<Mesa> insertaMesa(@RequestBody Mesa mesa){
+    public ResponseEntity<Mesa> insertaMesa(@RequestBody @Valid Mesa mesa){
         var mesaNueva = mesaRepository.save(mesa);
         return ResponseEntity.status(HttpStatus.CREATED).body(mesaNueva);
     }
 
+    @GetMapping("/mesas/paginacion")
+    public ResponseEntity<Page<Mesa>> dameClientesPaginacion(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = (Pageable) PageRequest.of(page, size);
+        Page<Mesa> mesas = mesaRepository.findAll(pageable);
+        return ResponseEntity.ok(mesas);
+    }
 
     @PutMapping("/mesa/{id}")
     public ResponseEntity<Mesa> modificaMesa(@PathVariable Long id, @RequestBody Mesa mesaNueva) {

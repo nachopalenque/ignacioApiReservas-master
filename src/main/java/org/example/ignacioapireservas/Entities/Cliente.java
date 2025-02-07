@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -20,12 +21,14 @@ public class Cliente {
     private Long id;
 
     @NotBlank(message = "El nombre del cliente no puede estar en blanco")
-    @Min(value = 3,message = "El nombre del cliente debe tener al menos 3 caracteres")
+    @Size(min = 3,message = "El nombre del cliente debe tener al menos 3 caracteres")
     private String nombre;
 
     @Column(unique = true)
     @Email
     private String email;
+
+    private String telefono;
 
     @OneToMany(targetEntity = Reserva.class, cascade = CascadeType.ALL,
             mappedBy = "cliente")
