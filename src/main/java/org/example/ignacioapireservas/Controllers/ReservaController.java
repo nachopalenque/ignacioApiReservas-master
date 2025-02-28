@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -88,16 +89,30 @@ public class ReservaController {
     }
 
     @DeleteMapping("/reserva/{id}")
-    public ResponseEntity<Void> eliminaReservaId(@PathVariable Long id){
-        Optional<Reserva> reserva = reservaRepository.findById(id);
+    public ResponseEntity<Void> eliminaReservaId(@PathVariable Long id, Authentication authentication){
 
-        if(reserva.isPresent()){
-            reservaRepository.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        else{
+        Cliente cliente = clienteRepository.findByNombre(authentication.getName());
+
+        if(cliente != null){
+
+            Optional<Reserva> reserva = reservaRepository.findById(id);
+
+            if(reserva.isPresent() && reserva.get().getCliente().getId() == cliente.getId()){
+                reservaRepository.deleteById(id);
+                return ResponseEntity.noContent().build();
+            }
+            else{
+                return ResponseEntity.notFound().build();
+            }
+
+
+        }else{
+
             return ResponseEntity.notFound().build();
+
         }
+
+
 
     }
 
