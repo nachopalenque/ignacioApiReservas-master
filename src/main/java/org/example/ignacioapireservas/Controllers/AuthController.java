@@ -4,7 +4,9 @@ import org.example.ignacioapireservas.Config.JwtTokenProvider;
 import org.example.ignacioapireservas.DTO.LoginRequestDTO;
 import org.example.ignacioapireservas.DTO.LoginResponseDTO;
 import org.example.ignacioapireservas.DTO.UserRegisterDTO;
+import org.example.ignacioapireservas.Entities.Cliente;
 import org.example.ignacioapireservas.Entities.UserEntity;
+import org.example.ignacioapireservas.Repositories.ClienteRepository;
 import org.example.ignacioapireservas.Repositories.UserEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,14 +34,24 @@ public class AuthController {
     private JwtTokenProvider tokenProvider;
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private ClienteRepository repositorioCliente;
 
     @PostMapping("/auth/register")
     public ResponseEntity<UserEntity> save(@RequestBody UserRegisterDTO userDTO) {
+
+        Cliente cliente = new Cliente();
+        cliente.setNombre(userDTO.getUsername());
+        cliente.setEmail(userDTO.getEmail());
+        cliente.setTelefono(userDTO.getTelefono());
+        repositorioCliente.save(cliente);
+
         UserEntity userEntity = this.userRepository.save(
                 UserEntity.builder()
                         .username(userDTO.getUsername())
                         .password(passwordEncoder.encode(userDTO.getPassword()))
                         .email(userDTO.getEmail())
+                        .cliente(cliente)
                         .authorities(List.of("ROLE_USER", "ROLE_ADMIN"))
                         .build());
 
@@ -64,7 +76,7 @@ public class AuthController {
             String token = this.tokenProvider.generateToken(auth);
 
             //Devolvemos un código 200 con el username y token JWT
-            return ResponseEntity.ok(new LoginResponseDTO(user.getUsername(), token));
+            return ResponseEntity.ok(new LoginResponseDTO(user.getUsername(),token));
         }catch (Exception e) {  //Si el usuario no es válido, salta una excepción BadCredentialsException
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     Map.of(

@@ -3,9 +3,11 @@ package org.example.ignacioapireservas.Controllers;
 import jakarta.validation.Valid;
 import org.example.ignacioapireservas.DTO.ClienteReservaMesaDTO;
 import org.example.ignacioapireservas.Entities.Cliente;
+import org.example.ignacioapireservas.Entities.Horario;
 import org.example.ignacioapireservas.Entities.Mesa;
 import org.example.ignacioapireservas.Entities.Reserva;
 import org.example.ignacioapireservas.Repositories.ClienteRepository;
+import org.example.ignacioapireservas.Repositories.HorarioRepository;
 import org.example.ignacioapireservas.Repositories.MesaRepository;
 import org.example.ignacioapireservas.Repositories.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,8 @@ public class ReservaController {
     public ClienteRepository clienteRepository;
     @Autowired
     public MesaRepository mesaRepository;
+    @Autowired
+    private HorarioRepository horarioRepository;
 
     @GetMapping("/reservas")
     public ResponseEntity<List<Reserva>> dameReservas() {
@@ -58,12 +62,14 @@ public class ReservaController {
         //obtenemos los datos del cliente y de la mesa para posteriormente comprobar si existen
         Optional<Cliente> cliente = clienteRepository.findById(reserva.getCliente().getId());
         Optional<Mesa> mesa = mesaRepository.findById(reserva.getMesa().getId());
+        Optional<Horario> horario = horarioRepository.findById(reserva.getHorario().getId());
+
         //si el cliente y la mesa existe procedemos a realizar la reserva
         if (cliente.isPresent() && mesa.isPresent()) {
             List<Reserva> reservasDelDia = reservaRepository.findByfechaReserva(reserva.getFechaReserva());
 
             for (Reserva res : reservasDelDia) {
-                if(res.getMesa().getId() == reserva.getMesa().getId() && res.getHoraReserva() == reserva.getHoraReserva()) {
+                if(res.getMesa().getId() == reserva.getMesa().getId() && res.getHorario().getTramoHorario() == horario.get().getTramoHorario()) {
 
                     return ResponseEntity.notFound().build();
                 }
@@ -71,6 +77,7 @@ public class ReservaController {
 
             reserva.setMesa(mesa.get());
             reserva.setCliente(cliente.get());
+            reserva.setHorario(horario.get());
             return ResponseEntity.ok(reservaRepository.save(reserva));
 
         }else{
@@ -99,12 +106,12 @@ public class ReservaController {
         Reserva reserva = reservaRepository.findById(id).get();
         Optional<Mesa> mesa = mesaRepository.findById(nuevaReserva.getMesa().getId());
         Optional<Cliente> cliente = clienteRepository.findById(nuevaReserva.getCliente().getId());
-
+        Optional<Horario> horario = horarioRepository.findById(nuevaReserva.getHorario().getId());
         if(cliente.isPresent() && mesa.isPresent()){
             reserva.setMesa(mesa.get());
             reserva.setCliente(cliente.get());
             reserva.setFechaReserva(nuevaReserva.getFechaReserva());
-            reserva.setHoraReserva(nuevaReserva.getHoraReserva());
+            reserva.setHorario(horario.get());
             return ResponseEntity.ok(reservaRepository.save(reserva));
 
         }else{

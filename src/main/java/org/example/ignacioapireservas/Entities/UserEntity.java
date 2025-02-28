@@ -29,6 +29,10 @@ public class UserEntity implements UserDetails{
     private String username;
     private String password;
 
+    @OneToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
+
 
     @Builder.Default    //Para que Lombok con el patrón builder cree el ArrayList
     @ElementCollection(fetch = FetchType.EAGER) // Indica que esta lista se almacena en una tabla separada, pero sin una relación

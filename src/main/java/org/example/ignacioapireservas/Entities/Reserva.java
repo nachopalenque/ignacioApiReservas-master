@@ -23,15 +23,17 @@ public class Reserva {
     @JsonFormat(pattern = "dd-MM-yyyy")
     @FutureOrPresent
     private LocalDate fechaReserva;
-    @Min(value = 8, message = "La hora de la reserva ha de ser mayor de las 8 PM")
-    @Max(value = 23, message = "La hora de la reserva ha de ser menor de las 11 AM")
-    private double horaReserva;
+
     @Min(value = 1, message = "Para realizar la reserva debe de reservarse al menos para una persona.")
     private Long numeroPersonas;
 
     @ManyToOne(targetEntity = Cliente.class)
     @JoinColumn(name = "id_cliente")
     private Cliente cliente;
+
+    @ManyToOne(targetEntity = Horario.class)
+    @JoinColumn(name = "id_horario")
+    private Horario horario;
 
     @ManyToOne(targetEntity = Mesa.class)
     @JoinColumn(name = "id_mesa")

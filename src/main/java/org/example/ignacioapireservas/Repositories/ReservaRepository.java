@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
       List<Reserva> findByfechaReserva(LocalDate fecha);
+      List<Reserva> findByCliente(Cliente cliente);
+
       Page<Reserva> findAll(Pageable pageable);
 
 }

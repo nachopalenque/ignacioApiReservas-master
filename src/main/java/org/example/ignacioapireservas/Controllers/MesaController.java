@@ -3,7 +3,9 @@ package org.example.ignacioapireservas.Controllers;
 
 import jakarta.validation.Valid;
 import org.example.ignacioapireservas.Entities.Mesa;
+import org.example.ignacioapireservas.Entities.Reserva;
 import org.example.ignacioapireservas.Repositories.MesaRepository;
+import org.example.ignacioapireservas.Repositories.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,13 +23,50 @@ import java.util.Optional;
 public class MesaController {
     @Autowired
     private MesaRepository mesaRepository;
-
+    @Autowired
+    private ReservaRepository reservaRepository;
 
     @GetMapping("/mesas")
     public ResponseEntity<List<Mesa>> dameMesas(){
         List<Mesa> mesas = mesaRepository.findAll();
         return ResponseEntity.ok(mesas);
     }
+
+
+
+    @GetMapping("/mesa/{fecha_Reserva}/{id_horario}")
+    public ResponseEntity<List<Mesa>> dameMesasDisponibles(@PathVariable LocalDate fecha_Reserva, @PathVariable Long id_horario){
+
+        List<Mesa> mesas = mesaRepository.findAll();
+        List<Reserva> reservas = reservaRepository.findByfechaReserva(fecha_Reserva);
+
+        for(Reserva re : reservas){
+
+            if(re.getHorario().getId() == id_horario){
+
+                Iterator<Mesa> iterator = mesas.iterator();
+
+                while (iterator.hasNext()) {
+                    Mesa mesa = iterator.next();
+                    if (mesa.getId().equals(re.getMesa().getId())) {
+                        iterator.remove();  // Elimina la mesa
+                        break;  // Salimos del bucle, ya que solo debe eliminarse una mesa por reserva
+                    }
+                }
+
+
+            }
+
+        }
+
+        return ResponseEntity.ok(mesas);
+
+    }
+
+
+
+
+
 
     @GetMapping("/mesa/{id}")
     public ResponseEntity<Mesa> dameMesa(@PathVariable Long id){
@@ -48,11 +89,17 @@ public class MesaController {
     }
 
     @GetMapping("/mesas/paginacion")
-    public ResponseEntity<Page<Mesa>> dameClientesPaginacion(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<Mesa>> dameMesasPaginacion(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = (Pageable) PageRequest.of(page, size);
         Page<Mesa> mesas = mesaRepository.findAll(pageable);
         return ResponseEntity.ok(mesas);
     }
+
+
+
+
+
+
 
     @PutMapping("/mesa/{id}")
     public ResponseEntity<Mesa> modificaMesa(@PathVariable Long id, @RequestBody Mesa mesaNueva) {

@@ -35,5 +35,9 @@ public class Cliente {
     @JsonIgnore
     private List<Reserva> reservas = new ArrayList<>();
 
+    @JsonIgnore
+    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL)
+    private UserEntity usuario;
+
 
 }

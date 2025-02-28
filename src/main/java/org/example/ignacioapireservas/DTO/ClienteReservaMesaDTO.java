@@ -12,11 +12,11 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class ClienteReservaMesaDTO {
+    public Long id_reserva;
     public String nombre;
-    public String email;
     @JsonFormat(pattern = "dd-MM-yyyy")
     public LocalDate fecha_reserva;
-    public Double hora_reserva;
+    public String hora_reserva;
     public Long numero_mesa;
     public Long numero_personas_reserva;
 }

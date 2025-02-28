@@ -50,6 +50,21 @@ public class ClienteController {
 
     }
 
+
+    @GetMapping("/cliente/username/{username}")
+    public ResponseEntity<Cliente> dameClienteEmail(@PathVariable String username){
+
+         Cliente cliente = clienteRepository.findByNombre(username);
+
+        if (cliente != null) {
+            return ResponseEntity.ok(cliente);
+        }else{
+
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
     //insertar cliente
     @PostMapping("/cliente")
     public ResponseEntity<Cliente> insertaCliente(@RequestBody @Valid Cliente cliente){
