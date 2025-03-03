@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -87,6 +88,26 @@ public class MesaController {
         var mesaNueva = mesaRepository.save(mesa);
         return ResponseEntity.status(HttpStatus.CREATED).body(mesaNueva);
     }
+
+
+    @PostMapping("/mesa/test")
+    public ResponseEntity<List<Mesa>>  insertaMesaTest(){
+        List<Mesa> mesas = new ArrayList<>();
+        Long mesaNum = 0L;
+
+        for (int i = 1; i < 13; i++) {
+            mesaNum++;
+            mesaRepository.save(Mesa.builder().numeroMesa(mesaNum)
+                    .descripcion("Esta es la mesa de prueba:"+i)
+                    .build());
+            mesas.add(Mesa.builder().numeroMesa(mesaNum)
+                    .descripcion("Esta es la mesa de prueba:"+i)
+                    .build());
+
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(mesas);
+    }
+
 
     @GetMapping("/mesas/paginacion")
     public ResponseEntity<Page<Mesa>> dameMesasPaginacion(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {

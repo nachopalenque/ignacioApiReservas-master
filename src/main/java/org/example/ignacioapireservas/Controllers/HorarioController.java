@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,34 @@ public class HorarioController {
     public ResponseEntity<Horario> insertaHorario(@RequestBody @Valid Horario horario){
         var nuevoHorario = repositorioHorario.save(horario);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoHorario);
+
+    }
+
+    //función para rellenar datos de prueba
+    @PostMapping("/horario/test")
+    public ResponseEntity<List<Horario>>  insertaHorarioTest(){
+
+        List<Horario> horarios = new ArrayList<>();
+
+        var nuevoHorario1 = repositorioHorario.save(Horario.builder().tramoHorario("Almuerzos 08:00 - 11:00")
+                .descripcion("Tramo horario para los almuerzos")
+                .build());
+
+        horarios.add(nuevoHorario1);
+
+        var nuevoHorario2 = repositorioHorario.save(Horario.builder().tramoHorario("Comidas 13:00 - 17:30")
+                .descripcion("Tramo horario para las comidas")
+                .build());
+
+        horarios.add(nuevoHorario2);
+
+        var nuevoHorario3 = repositorioHorario.save(Horario.builder().tramoHorario("Cenas 20:30 - 23:30")
+                .descripcion("Tramo horario para las cenas")
+                .build());
+
+        horarios.add(nuevoHorario3);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(horarios);
 
     }
 
